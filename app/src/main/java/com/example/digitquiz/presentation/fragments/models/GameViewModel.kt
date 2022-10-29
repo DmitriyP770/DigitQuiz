@@ -18,11 +18,9 @@ import com.example.digitquiz.domain.repo.GameRepository
 import com.example.digitquiz.domain.usecases.GenerateQuestionUseCase
 import com.example.digitquiz.domain.usecases.GetGameSettingsUseCase
 
-class GameViewModel (app:Application) : AndroidViewModel(app) {
+class GameViewModel (private val app:Application, private val difficulty: Difficulty) : ViewModel() {
     private var repository: GameRepository = GameRepositoryImpl
-    private lateinit var difficulty: Difficulty
     private lateinit var gameSettings: GameSettings
-    private val context = app
     private var timer :CountDownTimer? = null
     // make it simple int?
     private var _numOfRightAnswers: Int = 0
@@ -55,8 +53,12 @@ class GameViewModel (app:Application) : AndroidViewModel(app) {
     private var generateQuestionUseCase = GenerateQuestionUseCase(repository)
     private var getGameSettingsUseCase = GetGameSettingsUseCase(repository)
 
-    fun startGame(difficulty: Difficulty){
-        setUpGameSettings(difficulty)
+    init {
+        startGame()
+    }
+
+   private fun startGame(){
+        setUpGameSettings()
         startTimer()
         generateQuestion()
 
@@ -77,8 +79,7 @@ class GameViewModel (app:Application) : AndroidViewModel(app) {
         generateQuestion()
     }
 
-    private fun setUpGameSettings(difficulty: Difficulty){
-        this.difficulty = difficulty
+    private fun setUpGameSettings(){
         this.gameSettings = getGameSettingsUseCase(difficulty)
         _minPercent.value = gameSettings.minPercentageOfRightAnswers
     }
@@ -122,7 +123,7 @@ class GameViewModel (app:Application) : AndroidViewModel(app) {
     private fun updateProgress(){
         _percentOfRightAnswers.value = calculatePercentageOfRightAnswers()
         _progress.value = String.format(
-            context.resources.getString(R.string.progress_answers),
+            app.resources.getString(R.string.progress_answers),
             _numOfRightAnswers,
             gameSettings.minQuantityOfRightAswers
         )

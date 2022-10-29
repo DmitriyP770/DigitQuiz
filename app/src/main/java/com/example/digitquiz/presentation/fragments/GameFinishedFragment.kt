@@ -70,7 +70,7 @@ class GameFinishedFragment : Fragment() {
                 getString(R.string.required_percentage),
                 result.gameSettings.minPercentageOfRightAnswers
             )
-            tvScorePercentage.text = String.format(
+            tvScoreAnswers.text = String.format(
                 getString(R.string.score_answers),
                 result.qtyOfRightAnswers
             )

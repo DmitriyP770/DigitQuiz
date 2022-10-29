@@ -15,6 +15,7 @@ import com.example.digitquiz.domain.entity.Difficulty
 import com.example.digitquiz.domain.entity.GameResult
 import com.example.digitquiz.domain.entity.GameSettings
 import com.example.digitquiz.presentation.fragments.models.GameViewModel
+import com.example.digitquiz.presentation.fragments.models.GameViewModelFactory
 
 class GameFragment : Fragment() {
     private lateinit var difficulty : Difficulty
@@ -23,7 +24,7 @@ class GameFragment : Fragment() {
         get() = _binding ?: throw RuntimeException("null")
     private val viewModel : GameViewModel by lazy {
         ViewModelProvider(this,
-        ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        GameViewModelFactory(requireActivity().application, difficulty)
         )[GameViewModel::class.java]
     }
     private val tvOptions by lazy {
@@ -55,7 +56,6 @@ class GameFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeVM()
         setListenersOnOptions()
-        viewModel.startGame(difficulty)
 
     }
 
