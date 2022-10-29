@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.digitquiz.R
 import com.example.digitquiz.databinding.FragmentWelcomeBinding
 import java.lang.RuntimeException
@@ -37,10 +38,6 @@ class WelcomeFragment : Fragment() {
     }
 
     private fun launchNextFragment(){
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_container, GameSettingsFragment.newInstance())
-            .addToBackStack(null)
-            .commit()
+        findNavController().navigate(R.id.action_welcomeFragment_to_gameSettingsFragment)
     }
 }

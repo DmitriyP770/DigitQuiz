@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.digitquiz.R
 import com.example.digitquiz.databinding.FragmentGameBinding
 import com.example.digitquiz.domain.entity.Difficulty
@@ -18,13 +20,13 @@ import com.example.digitquiz.presentation.fragments.models.GameViewModel
 import com.example.digitquiz.presentation.fragments.models.GameViewModelFactory
 
 class GameFragment : Fragment() {
-    private lateinit var difficulty : Difficulty
     private var _binding : FragmentGameBinding? = null
     private val  binding : FragmentGameBinding
         get() = _binding ?: throw RuntimeException("null")
+    private val args by navArgs<GameFragmentArgs>()
     private val viewModel : GameViewModel by lazy {
         ViewModelProvider(this,
-        GameViewModelFactory(requireActivity().application, difficulty)
+        GameViewModelFactory(requireActivity().application, args.difficulty)
         )[GameViewModel::class.java]
     }
     private val tvOptions by lazy {
@@ -49,7 +51,6 @@ class GameFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        parsArgs()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,9 +65,6 @@ class GameFragment : Fragment() {
         _binding = null
     }
 
-    private fun parsArgs(){
-        difficulty = requireArguments().getParcelable<Difficulty>(KEY_DIFFICULTY) as Difficulty
-    }
 
     private fun observeVM(){
         viewModel.question.observe(viewLifecycleOwner){
@@ -110,15 +108,13 @@ class GameFragment : Fragment() {
     }
 
     private fun launchNext(result: GameResult){
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_container, GameFinishedFragment.newInstance(result))
-            .addToBackStack(null)
-            .commit()
+        findNavController().navigate(
+            GameFragmentDirections.actionGameFragmentToGameFinishedFragment2(result)
+        )
     }
 
     private fun getColor(condition: Boolean):Int{
-        var colorRes = if (condition){
+        val colorRes = if (condition){
             android.R.color.holo_green_light
         } else{
             android.R.color.holo_red_light
@@ -126,16 +122,5 @@ class GameFragment : Fragment() {
         return ContextCompat.getColor(requireContext(), colorRes)
     }
 
-    companion object{
-        const val NAME = "GAME_FR"
-        private const val KEY_DIFFICULTY = "difficulty"
-        fun newInstance(difficulty: Difficulty) : GameFragment{
 
-            return GameFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_DIFFICULTY, difficulty)
-                }
-            }
-        }
-    }
 }

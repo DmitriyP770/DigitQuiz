@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.digitquiz.R
 import com.example.digitquiz.databinding.FragmentGameSettingsBinding
 import com.example.digitquiz.domain.entity.Difficulty
@@ -47,19 +48,9 @@ class GameSettingsFragment : Fragment() {
     }
 
     private fun launchGameFragment(difficulty: Difficulty){
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_container, GameFragment.newInstance(difficulty))
-            .addToBackStack(GameFragment.NAME)
-            .commit()
+
+        findNavController().navigate(
+            GameSettingsFragmentDirections.actionGameSettingsFragmentToGameFragment(difficulty)
+        )
     }
-
-    companion object {
-
-        fun newInstance() : GameSettingsFragment{
-            return GameSettingsFragment()
-        }
-
-    }
-
 }

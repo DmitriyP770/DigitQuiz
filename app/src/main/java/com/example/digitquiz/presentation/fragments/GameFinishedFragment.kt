@@ -8,6 +8,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.digitquiz.R
 import com.example.digitquiz.databinding.FragmentGameBinding
 import com.example.digitquiz.databinding.FragmentGameFinishedBinding
@@ -15,8 +17,11 @@ import com.example.digitquiz.domain.entity.GameResult
 import com.example.digitquiz.presentation.fragments.models.GameViewModel
 
 class GameFinishedFragment : Fragment() {
-    private var _binding : FragmentGameFinishedBinding? = null
-    private val binding : FragmentGameFinishedBinding
+
+    val args by navArgs<GameFinishedFragmentArgs>()
+
+    private var _binding: FragmentGameFinishedBinding? = null
+    private val binding: FragmentGameFinishedBinding
         get() = _binding ?: throw RuntimeException("null")
     private lateinit var result: GameResult
 
@@ -36,7 +41,6 @@ class GameFinishedFragment : Fragment() {
         binding.buttonRetry.setOnClickListener {
             retryGame()
         }
-        handleOnBackPress()
     }
 
     override fun onDestroyView() {
@@ -49,19 +53,17 @@ class GameFinishedFragment : Fragment() {
         parsArgs()
     }
 
-    private fun parsArgs(){
-        requireArguments().getParcelable<GameResult>(KEY_RESULT)?.let {
-            result = it
-        }
+    private fun parsArgs() {
+        result = args.result
     }
 
 
-    private fun calculatePercentage(total: Int, right:Int) : String{
-        return ((right/total.toDouble())*100).toInt().toString()
+    private fun calculatePercentage(total: Int, right: Int): String {
+        return ((right / total.toDouble()) * 100).toInt().toString()
     }
 
-    private fun bindViews(){
-        with(binding){
+    private fun bindViews() {
+        with(binding) {
             tvRequiredAnswers.text = String.format(
                 getString(R.string.required_score),
                 result.gameSettings.minQuantityOfRightAswers
@@ -82,35 +84,15 @@ class GameFinishedFragment : Fragment() {
         }
 
     }
-    private fun defineEmoji(result: GameResult) : Int{
-        if (result.hasWon){
+
+    private fun defineEmoji(result: GameResult): Int {
+        if (result.hasWon) {
             return R.drawable.ic_happy
         } else return R.drawable.ic_sad
     }
 
-    private fun retryGame(){
-        requireActivity().supportFragmentManager.popBackStack(
-            GameFragment.NAME,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    }
-    private fun handleOnBackPress(){
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner, object : OnBackPressedCallback(true){
-                override fun handleOnBackPressed() {
-                    retryGame()
-                }
-            }
-        )
-    }
+    private fun retryGame() {
+        findNavController().popBackStack()
 
-    companion object {
-        private const val KEY_RESULT = "result"
-        fun newInstance(result: GameResult) : GameFinishedFragment{
-            return GameFinishedFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_RESULT, result )
-                }
-            }
-        }
     }
 }
